@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Beach Safety Monitor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#eef4f8; --surface:#ffffff; --surface-2:#f5f9fc; --line:#dbe5ec;
+  --ink:#10222e; --ink-2:#44596a; --ink-3:#6f8394;
+  --sea:#0a6ea8; --sea-soft:#dcedf7;
+  --good:#1a8a4a; --good-bg:#e3f4ea;
+  --warn:#b57500; --warn-bg:#fdf1d8;
+  --bad:#c62a2a;  --bad-bg:#fbe3e1;
+  --hero-1:#0b5f91; --hero-2:#0a8fb0;
+  --radius:16px; --shadow:0 1px 2px rgba(16,34,46,.06),0 4px 16px rgba(16,34,46,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#081620; --surface:#0f2230; --surface-2:#13293a; --line:#1f3a4f;
+    --ink:#e7f0f6; --ink-2:#a9bccb; --ink-3:#7d93a5;
+    --sea:#4fb3e8; --sea-soft:#133449;
+    --good:#4cc47f; --good-bg:#12321f;
+    --warn:#f0b43c; --warn-bg:#3a2c0e;
+    --bad:#ff6b63;  --bad-bg:#3d1616;
+    --hero-1:#093a58; --hero-2:#0a5a73;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25);
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans Thai",system-ui,sans-serif;font-size:15px;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 40px}
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--hero-1),var(--hero-2));display:grid;place-items:center;flex:none}
+.brand h1{font-size:20px;margin:0;line-height:1.2}
+.brand p{margin:0;color:var(--ink-3);font-size:13px}
+.status{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);padding:8px 14px;border-radius:999px;font-size:13px;color:var(--ink-2)}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--ink-3);flex:none}
+.dot.on{background:var(--good);box-shadow:0 0 0 0 var(--good);animation:pulse 2s infinite}
+.dot.off{background:var(--bad)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--good) 60%,transparent)}70%{box-shadow:0 0 0 8px transparent}100%{box-shadow:0 0 0 0 transparent}}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+.card h2{font-size:15px;margin:0 0 12px;color:var(--ink-2);font-weight:600}
+
+.hero{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;margin-bottom:16px}
+.flag-card{position:relative;overflow:hidden;color:#fff;border:none;background:linear-gradient(135deg,var(--hero-1),var(--hero-2));padding:22px;min-height:220px}
+.flag-card .waves{position:absolute;left:0;right:0;bottom:-2px;opacity:.25}
+.flag-row{display:flex;align-items:center;gap:18px;position:relative}
+.flag-pole{width:84px;height:110px;flex:none}
+.flag-label{font-size:13px;opacity:.85;margin:0}
+.flag-title{font-size:32px;font-weight:700;margin:2px 0 4px;line-height:1.15}
+.flag-desc{margin:0;font-size:15px;opacity:.95}
+.reasons{position:relative;display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
+.reasons span{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);padding:3px 10px;border-radius:999px;font-size:12.5px}
+
+.act-list{display:grid;gap:8px}
+.act{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:var(--surface-2)}
+.act .ico{font-size:20px;width:28px;text-align:center;flex:none}
+.act .name{font-weight:600}
+.act .note{font-size:12.5px;color:var(--ink-3)}
+.act .grow{flex:1;min-width:0}
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:600;padding:2px 10px;border-radius:999px;white-space:nowrap}
+.chip.good{color:var(--good);background:var(--good-bg)}
+.chip.warn{color:var(--warn);background:var(--warn-bg)}
+.chip.bad{color:var(--bad);background:var(--bad-bg)}
+
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:16px}
+.kpi{padding:14px}
+.kpi .top{display:flex;align-items:center;justify-content:space-between;gap:6px;color:var(--ink-2);font-size:13px}
+.kpi .val{font-size:28px;font-weight:700;margin:6px 0 2px;line-height:1.1;font-variant-numeric:tabular-nums}
+.kpi .val small{font-size:14px;font-weight:500;color:var(--ink-3);margin-left:3px}
+.kpi .trend{font-size:12px;color:var(--ink-3)}
+.meter{height:6px;background:var(--surface-2);border-radius:99px;margin-top:10px;overflow:hidden;border:1px solid var(--line)}
+.meter i{display:block;height:100%;border-radius:99px;background:var(--sea);transition:width .6s ease}
+.meter.good i{background:var(--good)} .meter.warn i{background:var(--warn)} .meter.bad i{background:var(--bad)}
+
+.legend-note{margin:10px 0 0;font-size:12.5px;color:var(--ink-3)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.charts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.chart-box h3{font-size:13px;margin:0 0 6px;color:var(--ink-2);font-weight:600}
+.chart-box{min-width:0}
+.chart-box .cv{position:relative;height:190px}
+.side{display:grid;gap:16px;align-content:start}
+.uv-box .big{font-size:15px;margin:0 0 6px}
+.uv-box ul{margin:6px 0 0;padding-left:18px;color:var(--ink-2);font-size:13.5px}
+.log{list-style:none;margin:0;padding:0;display:grid;gap:6px;max-height:260px;overflow:auto}
+.log li{display:flex;gap:10px;font-size:13px;padding:6px 8px;border-radius:8px;background:var(--surface-2)}
+.log span{flex:1;min-width:0}
+.log time{color:var(--ink-3);font-variant-numeric:tabular-nums;flex:none}
+.empty{color:var(--ink-3);font-size:13px}
+
+.toast{position:fixed;left:50%;top:16px;transform:translate(-50%,-200%);visibility:hidden;background:var(--bad);color:#fff;padding:12px 18px;border-radius:12px;font-weight:600;box-shadow:0 8px 30px rgba(0,0,0,.25);transition:transform .35s ease;z-index:10;max-width:calc(100% - 32px)}
+.toast.show{transform:translate(-50%,0);visibility:visible}
+footer{color:var(--ink-3);font-size:12.5px;text-align:center;margin-top:8px}
+footer code{background:var(--surface);border:1px solid var(--line);padding:1px 6px;border-radius:6px}
+
+@media (max-width:1000px){.kpis{grid-template-columns:repeat(3,1fr)}.charts{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}}
+@media (max-width:720px){.hero{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}.flag-title{font-size:26px}.flag-pole{width:64px;height:84px}}
+</style>
+</head>
+<body>
+<div class="toast" id="toast" role="alert"></div>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M2 16c2 0 2-1.5 4-1.5S8 16 10 16s2-1.5 4-1.5 2 1.5 4 1.5 2-1.5 4-1.5"/><path d="M2 20c2 0 2-1.5 4-1.5S8 20 10 20s2-1.5 4-1.5 2 1.5 4 1.5 2-1.5 4-1.5"/><circle cx="16" cy="7" r="3"/></svg>
+      </div>
+      <div>
+        <h1>Beach Safety Monitor</h1>
+        <p id="placeName">สถานีตรวจวัดชายหาด</p>
+      </div>
+    </div>
+    <div class="status" aria-live="polite"><span class="dot" id="dot"></span><span id="statusText">กำลังเชื่อมต่อ…</span></div>
+  </header>
+
+  <section class="hero">
+    <div class="card flag-card" id="flagCard">
+      <svg class="waves" viewBox="0 0 1200 120" preserveAspectRatio="none" width="100%" height="90" aria-hidden="true"><path d="M0 60 C150 20 300 100 450 60 S750 20 900 60 1200 100 1200 60 V120 H0Z" fill="#fff"/></svg>
+      <div class="flag-row">
+        <svg class="flag-pole" viewBox="0 0 84 110" aria-hidden="true">
+          <rect x="8" y="4" width="5" height="104" rx="2" fill="#fff" opacity=".9"/>
+          <path id="flagShape" d="M13 8 H78 L66 30 L78 52 H13Z" fill="#9aa9b4" stroke="#fff" stroke-width="2"/>
+        </svg>
+        <div>
+          <p class="flag-label">สถานะธงเตือนตอนนี้</p>
+          <p class="flag-title" id="flagTitle">รอข้อมูล…</p>
+          <p class="flag-desc" id="flagDesc">กำลังรับข้อมูลจากเซ็นเซอร์</p>
+        </div>
+      </div>
+      <div class="reasons" id="reasons"></div>
+    </div>
+    <div class="card">
+      <h2>กิจกรรมที่ทำได้ตอนนี้</h2>
+      <div class="act-list" id="acts"><p class="empty">รอข้อมูล…</p></div>
+    </div>
+  </section>
+
+  <section class="kpis" id="kpis"></section>
+
+  <section class="card" style="margin-bottom:16px">
+    <h2>แนวโน้มย้อนหลัง (จาก history)</h2>
+    <div class="charts">
+      <div class="chart-box"><h3>ความสูงคลื่น (m)</h3><div class="cv"><canvas id="cWave"></canvas></div></div>
+      <div class="chart-box"><h3>ความเร็วลม (km/h)</h3><div class="cv"><canvas id="cWind"></canvas></div></div>
+      <div class="chart-box"><h3>ความเสี่ยงกระแสน้ำย้อน (0–100)</h3><div class="cv"><canvas id="cRip"></canvas></div></div>
+    </div>
+    <p class="legend-note">เส้นประ <span style="color:var(--warn)">━ ━</span> เกณฑ์เฝ้าระวัง (ธงเหลือง) · <span style="color:var(--bad)">━ ━</span> เกณฑ์อันตราย (ธงแดง)</p>
+  </section>
+
+  <section class="grid2">
+    <div class="card uv-box">
+      <h2>คำแนะนำแสงแดด</h2>
+      <div id="uvAdvice"><p class="empty">รอข้อมูล…</p></div>
+    </div>
+    <div class="card">
+      <h2>บันทึกเหตุการณ์</h2>
+      <ul class="log" id="log"><li class="empty">ยังไม่มีเหตุการณ์</li></ul>
+    </div>
+  </section>
+
+  <footer id="footer"></footer>
+</div>
+
+<script type="module">
+/* ==================== ตั้งค่า (แก้ตรงนี้) ==================== */
+const DATABASE_URL = "https://iot-219-default-rtdb.asia-southeast1.firebasedatabase.app/";
+const DB_NAME      = "iot-219";                   // ชื่อฐานข้อมูล
+const PLACE        = "หาดป่าตอง จ.ภูเก็ต (ข้อมูลจำลอง)";
+const OWNER        = "ปรมินทร์ ข้องรัก  รหัส 6710886219";
+const HISTORY_POINTS = 60;                        // จำนวนจุดในกราฟ
+const OFFLINE_AFTER  = 30;                        // วินาทีที่ไม่มีข้อมูลใหม่ = ออฟไลน์
+/* ============================================================= */
+
+const $ = id => document.getElementById(id);
+$("placeName").textContent = PLACE;
+$("footer").innerHTML = `ฐานข้อมูล <code>${DB_NAME}</code> · path <code>/latest</code> และ <code>/history</code> · ${OWNER}`;
+
+/* ---------- เกณฑ์ (ตรงกับ ESPHome) ---------- */
+const TH = { wave:[1.2,2.0], wind:[22,35], rip:[45,75] };
+const lvl = (v,[y,r]) => v>=r ? 2 : v>=y ? 1 : 0;
+const CLS = ["good","warn","bad"];
+const FLAG = [
+  {name:"ธงเขียว", color:"#2fb567", title:"ลงเล่นน้ำได้",       desc:"คลื่นลมสงบ ปลอดภัยสำหรับการเล่นน้ำทั่วไป"},
+  {name:"ธงเหลือง",color:"#f2b705", title:"เล่นน้ำด้วยความระวัง", desc:"ว่ายใกล้ฝั่ง อยู่ในเขตที่มีเจ้าหน้าที่ดูแล"},
+  {name:"ธงแดง",  color:"#e03b33", title:"ห้ามลงเล่นน้ำ",       desc:"คลื่นลมแรง เสี่ยงกระแสน้ำย้อนกลับ (Rip current)"},
+];
+const uvLevel = u => u>=11?["อันตรายมาก","bad"]:u>=8?["สูงมาก","bad"]:u>=6?["สูง","warn"]:u>=3?["ปานกลาง","warn"]:["ต่ำ","good"];
+const fmtTime = ts => new Date(ts*1000).toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+
+/* ---------- KPI tiles ---------- */
+const KPI = [
+  {k:"wave_height", label:"ความสูงคลื่น", unit:"m",    max:4.5, dp:1, lv:v=>lvl(v,TH.wave), txt:["สงบ","ปานกลาง","สูง"]},
+  {k:"wind_speed",  label:"ความเร็วลม",  unit:"km/h", max:70,  dp:1, lv:v=>lvl(v,TH.wind), txt:["เบา","ปานกลาง","แรง"]},
+  {k:"rip_risk",    label:"กระแสน้ำย้อน", unit:"/100", max:100, dp:0, lv:v=>lvl(v,TH.rip),  txt:["ต่ำ","เฝ้าระวัง","สูง"]},
+  {k:"uv_index",    label:"ดัชนี UV",     unit:"",     max:12,  dp:1, lv:v=>v>=8?2:v>=3?1:0, txt:null},
+  {k:"water_temp",  label:"อุณหภูมิน้ำ",  unit:"°C",   max:35,  dp:1, lv:()=>0, txt:["ปกติ"]},
+  {k:"tide_level",  label:"ระดับน้ำ",    unit:"m",    max:3,   dp:2, lv:v=>v>2.4||v<0.5?1:0, txt:null},
+];
+$("kpis").innerHTML = KPI.map(c=>`
+  <div class="card kpi" id="k_${c.k}">
+    <div class="top"><span>${c.label}</span><span class="chip" data-chip>–</span></div>
+    <div class="val"><span data-val>–</span><small>${c.unit}</small></div>
+    <div class="trend" data-trend>&nbsp;</div>
+    <div class="meter"><i data-bar style="width:0%"></i></div>
+  </div>`).join("");
+
+let history = [];   // เรียงเก่า -> ใหม่
+let latest = null;
+
+function trendOf(key){
+  if(history.length < 7) return "";
+  const now = history[history.length-1][key], prev = history[history.length-7][key];
+  const d = now - prev, eps = key==="rip_risk"?3:key==="wind_speed"?1.5:0.08;
+  return d>eps ? "▲ เพิ่มขึ้นใน 1 นาทีที่ผ่านมา" : d<-eps ? "▼ ลดลงใน 1 นาทีที่ผ่านมา" : "● ทรงตัว";
+}
+
+function renderKPIs(d){
+  for(const c of KPI){
+    const el = $("k_"+c.k), v = Number(d[c.k]);
+    const L = c.lv(v);
+    let label;
+    if(c.k==="uv_index") label = uvLevel(v)[0];
+    else if(c.k==="tide_level") label = v>2.4?"น้ำขึ้นสูง":v<0.5?"น้ำลงต่ำ":v>=d_prevTide?"น้ำกำลังขึ้น":"น้ำกำลังลง";
+    else label = c.txt[Math.min(L,c.txt.length-1)];
+    const chip = el.querySelector("[data-chip]");
+    chip.className = "chip "+CLS[L]; chip.textContent = label;
+    el.querySelector("[data-val]").textContent = v.toFixed(c.dp);
+    el.querySelector("[data-trend]").textContent = trendOf(c.k) || " ";
+    const bar = el.querySelector("[data-bar]");
+    bar.style.width = Math.max(2,Math.min(100, v/c.max*100))+"%";
+    bar.parentElement.className = "meter "+CLS[L];
+  }
+}
+let d_prevTide = 0;
+
+function renderFlag(d){
+  const f = FLAG[d.flag] ?? FLAG[0];
+  $("flagShape").setAttribute("fill", f.color);
+  $("flagTitle").textContent = `${f.name} · ${f.title}`;
+  $("flagDesc").textContent = f.desc;
+  const r = [];
+  const w=lvl(d.wave_height,TH.wave), wi=lvl(d.wind_speed,TH.wind), ri=lvl(d.rip_risk,TH.rip);
+  r.push(`${["🌊","⚠️","⛔"][w]} คลื่น ${d.wave_height} m`);
+  r.push(`${["🍃","⚠️","⛔"][wi]} ลม ${d.wind_speed} km/h`);
+  r.push(`${["✅","⚠️","⛔"][ri]} กระแสน้ำย้อน ${d.rip_risk}/100`);
+  $("reasons").innerHTML = r.map(x=>`<span>${x}</span>`).join("");
+}
+
+function renderActivities(d){
+  const {wave_height:w, wind_speed:wi, rip_risk:r, uv_index:u, flag} = d;
+  const A = [
+    {ico:"🏊", name:"ว่ายน้ำ (ผู้ใหญ่)",
+      s: flag===0?0:flag===1?1:2,
+      n: ["เล่นได้ตามปกติ","ว่ายใกล้ฝั่ง ในเขตธง","ห้ามลงน้ำ"][flag]},
+    {ico:"🧒", name:"เด็กเล่นน้ำ",
+      s: (w<0.8&&r<30)?0:flag===0?1:2,
+      n: (w<0.8&&r<30)?"น้ำตื้น คลื่นเล็ก มีผู้ใหญ่ดูแล":flag===0?"ให้อยู่ริมชายฝั่งเท่านั้น":"ไม่ควรให้เด็กลงน้ำ"},
+    {ico:"🏄", name:"เซิร์ฟ",
+      s: (w>=1.0&&w<=2.5&&wi<35)?0:(w<1.0?1:2),
+      n: (w>=1.0&&w<=2.5&&wi<35)?"คลื่นกำลังดีสำหรับเซิร์ฟ":w<1.0?"คลื่นเล็ก เหมาะฝึกมือใหม่":"คลื่น/ลมแรงเกินไป"},
+    {ico:"🛶", name:"คายัค / SUP",
+      s: (wi<15&&w<0.8)?0:(wi<22&&w<1.2)?1:2,
+      n: (wi<15&&w<0.8)?"น้ำนิ่ง ลมเบา":(wi<22&&w<1.2)?"พายใกล้ฝั่ง สวมเสื้อชูชีพ":"ลมแรง เสี่ยงถูกพัดออกทะเล"},
+    {ico:"🏖️", name:"อาบแดด / เดินชายหาด",
+      s: u<6?0:u<8?1:2,
+      n: u<6?"แดดกำลังดี":u<8?"ทาครีมกันแดด หาที่ร่ม":"หลบแดด 11:00–15:00"},
+  ];
+  const t = ["✓ ได้","⚠ ระวัง","✕ ไม่แนะนำ"];
+  $("acts").innerHTML = A.map(a=>`
+    <div class="act"><span class="ico" aria-hidden="true">${a.ico}</span>
+      <div class="grow"><div class="name">${a.name}</div><div class="note">${a.n}</div></div>
+      <span class="chip ${CLS[a.s]}">${t[a.s]}</span></div>`).join("");
+}
+
+function renderUV(d){
+  const u = Number(d.uv_index), [lab,cls] = uvLevel(u);
+  const burn = u>=1 ? Math.round(150/u) : null;
+  const tips = [];
+  if(u>=3) tips.push("ทาครีมกันแดด SPF 50+ ทาซ้ำทุก 2 ชม. และหลังขึ้นจากน้ำ");
+  if(u>=6) tips.push("สวมหมวก แว่นกันแดด และเสื้อแขนยาว");
+  if(u>=8) tips.push("หลีกเลี่ยงแดดจัดช่วง 11:00–15:00");
+  tips.push(`ดื่มน้ำบ่อยๆ อุณหภูมิน้ำทะเล ${d.water_temp}°C`);
+  $("uvAdvice").innerHTML = `
+    <p class="big">UV <b>${u.toFixed(1)}</b> <span class="chip ${cls}">${lab}</span></p>
+    ${burn?`<p class="big" style="font-size:13.5px;color:var(--ink-2)">ผิวอาจเริ่มไหม้ใน <b>~${burn} นาที</b> หากไม่ป้องกัน (ประมาณการ)</p>`:""}
+    <ul>${tips.map(t=>`<li>${t}</li>`).join("")}</ul>`;
+}
+
+/* ---------- บันทึกเหตุการณ์ (สร้างจาก history) ---------- */
+let localEvents = [];
+function renderLog(){
+  const ev = [];
+  for(let i=1;i<history.length;i++){
+    const a=history[i-1], b=history[i];
+    if(a.flag!==b.flag) ev.push({ts:b.timestamp, t:`${b.flag>a.flag?"⬆":"⬇"} เปลี่ยนเป็น${FLAG[b.flag]?.name} (คลื่น ${b.wave_height} m, ลม ${b.wind_speed} km/h)`});
+    if(a.uv_index<8 && b.uv_index>=8) ev.push({ts:b.timestamp, t:"☀️ UV สูงมาก (≥ 8)"});
+  }
+  const all = ev.concat(localEvents).sort((x,y)=>y.ts-x.ts).slice(0,12);
+  $("log").innerHTML = all.length ? all.map(e=>`<li><time>${fmtTime(e.ts)}</time><span>${e.t}</span></li>`).join("")
+                                  : `<li class="empty">ยังไม่มีเหตุการณ์ในช่วงนี้ ทุกอย่างปกติ</li>`;
+}
+
+/* ---------- กราฟ ---------- */
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+Chart.defaults.font.family = '"IBM Plex Sans Thai", system-ui, sans-serif';
+Chart.defaults.color = css("--ink-3");
+function makeChart(id, key, lines, max){
+  const ch = new Chart($(id), {
+    type:"line",
+    data:{labels:[], datasets:[
+      {data:[], borderColor:css("--sea"), backgroundColor:css("--sea-soft"), fill:true, borderWidth:2, pointRadius:0, pointHoverRadius:5, tension:.35},
+      ...lines.map(([v,c,l])=>({label:l, data:[], borderColor:c, borderWidth:1.5, borderDash:[5,4], pointRadius:0, pointHoverRadius:0, fill:false, _th:v}))
+    ]},
+    options:{
+      responsive:true, maintainAspectRatio:false, animation:{duration:300},
+      interaction:{mode:"index", intersect:false},
+      plugins:{legend:{display:false}, tooltip:{filter:i=>i.datasetIndex===0, displayColors:false,
+        callbacks:{label:i=>`${i.formattedValue}`}}},
+      scales:{
+        x:{ticks:{maxTicksLimit:4, maxRotation:0}, grid:{display:false}},
+        y:{beginAtZero:true, suggestedMax:max, grid:{color:css("--line")}, border:{display:false}}
+      }
+    }
+  });
+  ch._key = key;
+  return ch;
+}
+const charts = [
+  makeChart("cWave","wave_height",[[TH.wave[0],css("--warn"),"เฝ้าระวัง"],[TH.wave[1],css("--bad"),"อันตราย"]],3),
+  makeChart("cWind","wind_speed",[[TH.wind[0],css("--warn"),"เฝ้าระวัง"],[TH.wind[1],css("--bad"),"อันตราย"]],50),
+  makeChart("cRip","rip_risk",[[TH.rip[0],css("--warn"),"เฝ้าระวัง"],[TH.rip[1],css("--bad"),"อันตราย"]],100),
+];
+function renderCharts(){
+  const labels = history.map(h=>new Date(h.timestamp*1000).toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"}));
+  for(const ch of charts){
+    const key = ch._key;
+    ch.data.labels = labels;
+    ch.data.datasets[0].data = history.map(h=>h[key]);
+    ch.data.datasets.slice(1).forEach(ds=>ds.data = history.map(()=>ds._th));
+    ch.update("none");
+  }
+}
+
+/* ---------- สถานะออนไลน์ ---------- */
+let wasOnline = null;
+function tickStatus(){
+  if(!latest){ return; }
+  const age = Math.max(0, Math.round(Date.now()/1000 - latest.timestamp));
+  const online = age <= OFFLINE_AFTER;
+  $("dot").className = "dot " + (online?"on":"off");
+  $("statusText").textContent = online
+    ? `ออนไลน์ · อัปเดต ${age} วินาทีที่แล้ว`
+    : `ESP32 ออฟไลน์ · ข้อมูลล่าสุด ${fmtTime(latest.timestamp)}`;
+  if(wasOnline===true && !online){ localEvents.push({ts:Date.now()/1000|0, t:"📡 ขาดการเชื่อมต่อกับ ESP32"}); renderLog(); }
+  if(wasOnline===false && online){ localEvents.push({ts:Date.now()/1000|0, t:"📡 ESP32 กลับมาออนไลน์"}); renderLog(); }
+  wasOnline = online;
+}
+setInterval(tickStatus, 1000);
+
+/* ---------- แจ้งเตือนเมื่อธงเปลี่ยนเป็นแดง ---------- */
+let lastFlag = null;
+function toast(msg){
+  const t=$("toast"); t.textContent=msg; t.classList.add("show");
+  clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove("show"),6000);
+}
+
+function onLatest(d){
+  if(!d) return;
+  for(const k of ["wave_height","wind_speed","uv_index","water_temp","rip_risk","tide_level","flag","timestamp"]) d[k]=Number(d[k]);
+  if(lastFlag!==null && d.flag===2 && lastFlag!==2){ toast("⛔ ธงแดง! ห้ามลงเล่นน้ำ คลื่นลมแรง"); navigator.vibrate?.(300); }
+  lastFlag = d.flag;
+  d_prevTide = latest ? latest.tide_level : d.tide_level;
+  latest = d;
+  renderFlag(d); renderKPIs(d); renderActivities(d); renderUV(d); tickStatus();
+}
+function onHistory(obj){
+  history = obj ? Object.values(obj).map(h=>({...h})).filter(h=>h.timestamp).sort((a,b)=>a.timestamp-b.timestamp) : [];
+  renderCharts(); renderLog();
+  if(latest) renderKPIs(latest);
+}
+
+/* ---------- แหล่งข้อมูล ---------- */
+const demo = new URLSearchParams(location.search).has("demo");
+if(demo){
+  // โหมดทดลอง: สร้างข้อมูลปลอมในเบราว์เซอร์ (เปิดด้วย ?demo) ใช้ดูหน้าตาเมื่อยังไม่มี ESP32
+  let s={w:.8,wi:14,t:29.5,k:0,storm:0}; const H={};
+  const step=(ts)=>{
+    if(!s.storm && Math.random()<.05) s.storm=8; const st=s.storm>0; if(st) s.storm--;
+    s.w+=((st?3.2:.8)-s.w)*.3+(Math.random()-.5)*.3; s.w=Math.max(.1,s.w);
+    s.wi+=((st?46:14)-s.wi)*.3+(Math.random()-.5)*4; s.wi=Math.max(0,s.wi);
+    s.k++; const h=new Date(ts*1000).getHours()+new Date(ts*1000).getMinutes()/60;
+    const rip=Math.min(100,Math.max(0,s.w*18+s.wi*.7+(Math.random()-.5)*8));
+    const flag=(s.w>=2||s.wi>=35||rip>=75)?2:(s.w>=1.2||s.wi>=22||rip>=45)?1:0;
+    return {wave_height:+s.w.toFixed(1), wind_speed:+s.wi.toFixed(1), uv_index:+Math.max(0,11*Math.exp(-(((h-12.5)/3)**2))).toFixed(1),
+      water_temp:+(29.5+(Math.random()-.5)*.4).toFixed(1), rip_risk:Math.round(rip), tide_level:+(1.5+1.3*Math.sin(s.k*.05)).toFixed(2), flag, timestamp:ts};
+  };
+  const now=Date.now()/1000|0;
+  for(let i=HISTORY_POINTS;i>0;i--){ H["d"+i]=step(now-i*10); }
+  onHistory(H); onLatest({...H["d1"]});
+  setInterval(()=>{ const d=step(Date.now()/1000|0); H["n"+d.timestamp]=d; const keys=Object.keys(H); if(keys.length>HISTORY_POINTS) delete H[keys[0]]; onHistory({...H}); onLatest({...d}); },10000);
+}else{
+  const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+  const { getDatabase, ref, onValue, query, limitToLast } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+  const db = getDatabase(initializeApp({ databaseURL: DATABASE_URL }));
+  onValue(ref(db,"latest"), s=>onLatest(s.val()), e=>{ $("statusText").textContent="เชื่อมต่อ Firebase ไม่ได้: "+e.message; $("dot").className="dot off"; });
+  onValue(query(ref(db,"history"), limitToLast(HISTORY_POINTS)), s=>onHistory(s.val()));
+}
+</script>
+</body>
+</html>
