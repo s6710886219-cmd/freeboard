@@ -98,6 +98,53 @@ header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-betw
 
 .toast{position:fixed;left:50%;top:16px;transform:translate(-50%,-200%);visibility:hidden;background:var(--bad);color:#fff;padding:12px 18px;border-radius:12px;font-weight:600;box-shadow:0 8px 30px rgba(0,0,0,.25);transition:transform .35s ease;z-index:10;max-width:calc(100% - 32px)}
 .toast.show{transform:translate(-50%,0);visibility:visible}
+.card-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.card-head h2{margin:0}
+.btn{font:inherit;font-size:13.5px;font-weight:600;border:1px solid var(--sea);background:var(--sea);color:#fff;padding:7px 14px;border-radius:10px;cursor:pointer}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--sea)}
+.icon-btn{font:inherit;font-size:18px;width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);cursor:pointer;flex:none}
+.kpi{cursor:pointer;transition:transform .15s ease,border-color .15s ease}
+.kpi:hover{transform:translateY(-2px);border-color:var(--sea)}
+.muted{color:var(--ink-3);font-size:13px;margin:0;font-weight:400}
+
+dialog#hist{width:min(1180px,calc(100% - 24px));max-height:calc(100% - 24px);padding:0;border:1px solid var(--line);border-radius:18px;background:var(--bg);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+dialog#hist::backdrop{background:rgba(5,20,30,.55);backdrop-filter:blur(2px)}
+.dlg-head{position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:16px 18px;background:var(--surface);border-bottom:1px solid var(--line)}
+.dlg-head h2{margin:0;font-size:19px}
+.filters{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;padding:14px 18px;background:var(--surface);border-bottom:1px solid var(--line)}
+.seg{display:inline-flex;flex-wrap:wrap;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px}
+.seg button{font:inherit;font-size:13px;border:0;background:transparent;color:var(--ink-2);padding:6px 12px;border-radius:8px;cursor:pointer}
+.seg button.on{background:var(--surface);color:var(--sea);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.range{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.range label{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ink-2)}
+.range input{font:inherit;font-size:13px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);color-scheme:light dark}
+#histBody{padding:16px 18px 20px;display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
+#histBody>*,.sum-grid>*,.hcharts>*{min-width:0}
+.card.sm{padding:14px 16px}
+.card.sm h3{font-size:14px;margin:0 0 10px;color:var(--ink-2);font-weight:600}
+.sum-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.flagbar{display:flex;height:26px;border-radius:8px;overflow:hidden;gap:2px;background:var(--surface-2)}
+.flagbar i{display:block;height:100%;min-width:0;transition:width .4s ease}
+.flaglegend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;font-size:13px;color:var(--ink-2)}
+.flaglegend b{color:var(--ink)}
+.flaglegend .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fact{background:var(--surface-2);border-radius:10px;padding:8px 10px}
+.fact .n{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
+.fact .l{font-size:12.5px;color:var(--ink-3)}
+.hcharts{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.hcharts .cv{position:relative;height:200px}
+.tbl-wrap{overflow:auto}
+.tbl-wrap.tall{max-height:360px}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+.tbl th,.tbl td{padding:7px 10px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl th:first-child,.tbl td:first-child{text-align:left}
+.tbl thead th{position:sticky;top:0;background:var(--surface);color:var(--ink-2);font-weight:600}
+.loading{padding:40px;text-align:center;color:var(--ink-3)}
+@media (max-width:1000px){.hcharts{grid-template-columns:1fr 1fr}}
+@media (max-width:720px){.hcharts,.sum-grid,.facts{grid-template-columns:1fr}dialog#hist{width:100vw;max-width:100vw;max-height:100dvh;height:100dvh;border:0;border-radius:0;margin:0}.sum-grid{grid-template-columns:minmax(0,1fr)}}
+
 footer{color:var(--ink-3);font-size:12.5px;text-align:center;margin-top:8px}
 footer code{background:var(--surface);border:1px solid var(--line);padding:1px 6px;border-radius:6px}
 
@@ -146,7 +193,10 @@ footer code{background:var(--surface);border:1px solid var(--line);padding:1px 6
   <section class="kpis" id="kpis"></section>
 
   <section class="card" style="margin-bottom:16px">
-    <h2>แนวโน้มย้อนหลัง (จาก history)</h2>
+    <div class="card-head">
+      <h2>แนวโน้มล่าสุด (10 นาที)</h2>
+      <button class="btn" id="openHist" type="button">📊 ดูข้อมูลย้อนหลัง / เลือกวัน-เวลา</button>
+    </div>
     <div class="charts">
       <div class="chart-box"><h3>ความสูงคลื่น (m)</h3><div class="cv"><canvas id="cWave"></canvas></div></div>
       <div class="chart-box"><h3>ความเร็วลม (km/h)</h3><div class="cv"><canvas id="cWind"></canvas></div></div>
@@ -169,12 +219,64 @@ footer code{background:var(--surface);border:1px solid var(--line);padding:1px 6
   <footer id="footer"></footer>
 </div>
 
+<!-- ==================== หน้าต่างข้อมูลย้อนหลัง ==================== -->
+<dialog id="hist" aria-labelledby="histTitle">
+  <div class="dlg-head">
+    <div>
+      <h2 id="histTitle">ข้อมูลย้อนหลัง</h2>
+      <p class="muted" id="histInfo">เลือกช่วงเวลาที่ต้องการ</p>
+    </div>
+    <button class="icon-btn" id="closeHist" type="button" aria-label="ปิด">✕</button>
+  </div>
+  <div class="filters">
+    <div class="seg" id="presets" role="group" aria-label="ช่วงเวลาด่วน">
+      <button type="button" data-r="1h">1 ชม.</button>
+      <button type="button" data-r="6h">6 ชม.</button>
+      <button type="button" data-r="today">วันนี้</button>
+      <button type="button" data-r="24h">24 ชม.</button>
+      <button type="button" data-r="all">ภาพรวมทั้งหมด</button>
+    </div>
+    <div class="range">
+      <label>ตั้งแต่<input type="datetime-local" id="fromDt"></label>
+      <label>ถึง<input type="datetime-local" id="toDt"></label>
+      <button class="btn" id="applyRange" type="button">ค้นหา</button>
+      <button class="btn ghost" id="csvBtn" type="button">⬇ CSV</button>
+    </div>
+  </div>
+
+  <div id="histBody">
+    <div class="sum-grid">
+      <div class="card sm">
+        <h3>สัดส่วนเวลาตามสถานะธง</h3>
+        <div class="flagbar" id="flagBar"></div>
+        <div class="flaglegend" id="flagLegend"></div>
+      </div>
+      <div class="card sm">
+        <h3>สรุปเหตุการณ์</h3>
+        <div class="facts" id="facts"></div>
+      </div>
+    </div>
+
+    <div class="card sm">
+      <h3>สถิติแต่ละค่า (ต่ำสุด / เฉลี่ย / สูงสุด)</h3>
+      <div class="tbl-wrap"><table class="tbl" id="statTbl"></table></div>
+    </div>
+
+    <div class="hcharts" id="hcharts"></div>
+
+    <div class="card sm">
+      <h3>ตารางข้อมูล <span class="muted" id="rowInfo"></span></h3>
+      <div class="tbl-wrap tall"><table class="tbl" id="rowTbl"></table></div>
+    </div>
+  </div>
+</dialog>
+
 <script type="module">
 /* ==================== ตั้งค่า (แก้ตรงนี้) ==================== */
-const DATABASE_URL = "https://iot-219-default-rtdb.asia-southeast1.firebasedatabase.app/";
-const DB_NAME      = "iot-219";                   // ชื่อฐานข้อมูล
+const DATABASE_URL = "https://iot-XXX-default-rtdb.asia-southeast1.firebasedatabase.app";
+const DB_NAME      = "iot-XXX";                   // ชื่อฐานข้อมูล
 const PLACE        = "หาดป่าตอง จ.ภูเก็ต (ข้อมูลจำลอง)";
-const OWNER        = "ปรมินทร์ ข้องรัก  รหัส 6710886219";
+const OWNER        = "ชื่อ-นามสกุล  รหัส 6xxxxxxxxx";
 const HISTORY_POINTS = 60;                        // จำนวนจุดในกราฟ
 const OFFLINE_AFTER  = 30;                        // วินาทีที่ไม่มีข้อมูลใหม่ = ออฟไลน์
 /* ============================================================= */
@@ -387,11 +489,154 @@ function onHistory(obj){
   if(latest) renderKPIs(latest);
 }
 
+/* ==================== ข้อมูลย้อนหลัง (หน้าต่าง) ==================== */
+const METRICS = [
+  {k:"wave_height", label:"ความสูงคลื่น",  unit:"m",    dp:1, th:TH.wave},
+  {k:"wind_speed",  label:"ความเร็วลม",   unit:"km/h", dp:1, th:TH.wind},
+  {k:"rip_risk",    label:"กระแสน้ำย้อน",  unit:"/100", dp:0, th:TH.rip},
+  {k:"uv_index",    label:"ดัชนี UV",      unit:"",     dp:1, th:[6,8]},
+  {k:"water_temp",  label:"อุณหภูมิน้ำ",   unit:"°C",   dp:1, th:null},
+  {k:"tide_level",  label:"ระดับน้ำ",      unit:"m",    dp:2, th:null},
+];
+const FLAG_COL = () => [css("--good"), css("--warn"), css("--bad")];
+const normalize = obj => obj ? Object.values(obj).filter(h=>h && h.timestamp)
+  .map(h=>{ const o={}; for(const k in h) o[k]=Number(h[k]); return o; }).sort((a,b)=>a.timestamp-b.timestamp) : [];
+const pad = n => String(n).padStart(2,"0");
+const toInput = ts => { const d=new Date(ts*1000); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+const fromInput = v => v ? Math.floor(new Date(v).getTime()/1000) : null;
+const fmtDT = ts => new Date(ts*1000).toLocaleString("th-TH",{day:"numeric",month:"short",year:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"});
+let fetchRange = async () => [];
+let histRows = [], hCharts = {};
+
+function downsample(rows, maxPts=300){
+  if(rows.length<=maxPts) return rows;
+  const size = Math.ceil(rows.length/maxPts), out=[];
+  for(let i=0;i<rows.length;i+=size){
+    const b=rows.slice(i,i+size), o={timestamp:b[0].timestamp, flag:Math.max(...b.map(x=>x.flag))};
+    for(const m of METRICS) o[m.k]=b.reduce((a,x)=>a+x[m.k],0)/b.length;
+    out.push(o);
+  }
+  return out;
+}
+
+function buildHistCharts(){
+  if(Object.keys(hCharts).length) return;
+  $("hcharts").innerHTML = METRICS.map(m=>`<div class="card sm" id="hc_${m.k}"><h3>${m.label}${m.unit?` (${m.unit==="/100"?"0–100":m.unit})`:""}</h3><div class="cv"><canvas id="hcv_${m.k}"></canvas></div></div>`).join("");
+  for(const m of METRICS){
+    const ds=[{data:[], borderColor:css("--sea"), backgroundColor:css("--sea-soft"), fill:true, borderWidth:2, pointRadius:0, pointHoverRadius:5, tension:.25}];
+    if(m.th) ds.push({data:[],borderColor:css("--warn"),borderWidth:1.5,borderDash:[5,4],pointRadius:0,pointHoverRadius:0},
+                     {data:[],borderColor:css("--bad"), borderWidth:1.5,borderDash:[5,4],pointRadius:0,pointHoverRadius:0});
+    hCharts[m.k] = new Chart($("hcv_"+m.k), {type:"line", data:{labels:[],datasets:ds},
+      options:{responsive:true, maintainAspectRatio:false, animation:false, interaction:{mode:"index",intersect:false},
+        plugins:{legend:{display:false}, tooltip:{filter:i=>i.datasetIndex===0, displayColors:false,
+          callbacks:{label:i=>`${m.label} ${Number(i.raw).toFixed(m.dp)} ${m.unit}`}}},
+        scales:{x:{ticks:{maxTicksLimit:5,maxRotation:0},grid:{display:false}},
+                y:{beginAtZero:m.k!=="water_temp", grid:{color:css("--line")}, border:{display:false}}}}});
+  }
+}
+
+function renderHist(rows, fromTs, toTs){
+  histRows = rows;
+  const span = rows.length ? rows[rows.length-1].timestamp - rows[0].timestamp : 0;
+  $("histInfo").textContent = rows.length
+    ? `${fmtDT(rows[0].timestamp)} – ${fmtDT(rows[rows.length-1].timestamp)} · ${rows.length.toLocaleString()} รายการ`
+    : `ไม่มีข้อมูลในช่วง ${fromTs?fmtDT(fromTs):"เริ่มต้น"} – ${toTs?fmtDT(toTs):"ปัจจุบัน"}`;
+  $("histBody").style.display = rows.length ? "" : "none";
+  if(!rows.length) return;
+
+  // ระยะเวลาของแต่ละแถว (ช่องว่างเกิน 60 วินาที = ESP32 ขาดการเชื่อมต่อ ไม่นับ)
+  const dur = rows.map((r,i)=> i<rows.length-1 ? Math.min(rows[i+1].timestamp-r.timestamp, 60) : 10);
+  const fsec=[0,0,0]; rows.forEach((r,i)=>fsec[r.flag]+=dur[i]);
+  const tot = fsec.reduce((a,b)=>a+b,0)||1, col=FLAG_COL();
+  const hm = sec => sec>=3600 ? `${Math.floor(sec/3600)} ชม. ${Math.round(sec%3600/60)} นาที` : `${Math.round(sec/60)} นาที`;
+  $("flagBar").innerHTML = fsec.map((v,i)=>v?`<i style="width:${v/tot*100}%;background:${col[i]}" title="${FLAG[i].name} ${(v/tot*100).toFixed(1)}%"></i>`:"").join("");
+  $("flagLegend").innerHTML = fsec.map((v,i)=>`<span><span class="sw" style="background:${col[i]}"></span>${FLAG[i].name} <b>${(v/tot*100).toFixed(1)}%</b> (${hm(v)})</span>`).join("");
+
+  let reds=0, gaps=0; for(let i=1;i<rows.length;i++){ if(rows[i].flag===2&&rows[i-1].flag!==2) reds++; if(rows[i].timestamp-rows[i-1].timestamp>60) gaps++; }
+  const maxOf = k => rows.reduce((a,r)=>r[k]>a[k]?r:a, rows[0]);
+  const mw=maxOf("wave_height"), mwi=maxOf("wind_speed"), mu=maxOf("uv_index");
+  $("facts").innerHTML = [
+    [rows.length.toLocaleString(), "จำนวนข้อมูลที่บันทึก"],
+    [hm(span), "ช่วงเวลาที่ครอบคลุม"],
+    [`${reds} ครั้ง`, "จำนวนครั้งที่ขึ้นธงแดง"],
+    [`${mw.wave_height.toFixed(1)} m`, `คลื่นสูงสุด · ${fmtTime(mw.timestamp)}`],
+    [`${mwi.wind_speed.toFixed(1)} km/h`, `ลมแรงสุด · ${fmtTime(mwi.timestamp)}`],
+    [`${gaps} ครั้ง`, "ESP32 ขาดการเชื่อมต่อ (> 60 วิ)"],
+  ].map(([n,l])=>`<div class="fact"><div class="n">${n}</div><div class="l">${l}</div></div>`).join("");
+
+  $("statTbl").innerHTML = `<thead><tr><th>ค่า</th><th>ต่ำสุด</th><th>เฉลี่ย</th><th>สูงสุด</th><th>เวลาที่สูงสุด</th></tr></thead><tbody>` +
+    METRICS.map(m=>{ const v=rows.map(r=>r[m.k]); const mx=maxOf(m.k);
+      return `<tr><td>${m.label}</td><td>${Math.min(...v).toFixed(m.dp)}</td><td>${(v.reduce((a,b)=>a+b,0)/v.length).toFixed(m.dp)}</td><td>${mx[m.k].toFixed(m.dp)}</td><td>${fmtDT(mx.timestamp)}</td></tr>`; }).join("") + `</tbody>`;
+
+  buildHistCharts();
+  const ds = downsample(rows), withDate = span > 20*3600;
+  const labels = ds.map(r=>{ const d=new Date(r.timestamp*1000); const t=`${pad(d.getHours())}:${pad(d.getMinutes())}`; return withDate?`${d.getDate()}/${d.getMonth()+1} ${t}`:t; });
+  for(const m of METRICS){
+    const ch=hCharts[m.k]; ch.data.labels=labels; ch.data.datasets[0].data=ds.map(r=>r[m.k]);
+    if(m.th){ ch.data.datasets[1].data=ds.map(()=>m.th[0]); ch.data.datasets[2].data=ds.map(()=>m.th[1]); }
+    ch.update();
+  }
+
+  const LIMIT=500, shown=rows.slice(-LIMIT).reverse(), chip=["good","warn","bad"];
+  $("rowInfo").textContent = rows.length>LIMIT ? `· แสดง ${LIMIT} รายการล่าสุดจาก ${rows.length.toLocaleString()} (ดาวน์โหลด CSV เพื่อดูทั้งหมด)` : `· ${rows.length} รายการ`;
+  $("rowTbl").innerHTML = `<thead><tr><th>วัน-เวลา</th><th>ธง</th>${METRICS.map(m=>`<th>${m.label}</th>`).join("")}</tr></thead><tbody>` +
+    shown.map(r=>`<tr><td>${fmtDT(r.timestamp)}</td><td><span class="chip ${chip[r.flag]}">${FLAG[r.flag].name}</span></td>${METRICS.map(m=>`<td>${r[m.k].toFixed(m.dp)}</td>`).join("")}</tr>`).join("") + `</tbody>`;
+}
+
+async function loadRange(fromTs, toTs){
+  $("histInfo").textContent = "กำลังโหลดข้อมูล…";
+  try { renderHist(await fetchRange(fromTs, toTs), fromTs, toTs); }
+  catch(e){ $("histInfo").textContent = "โหลดข้อมูลไม่สำเร็จ: " + e.message; }
+}
+async function applyPreset(r){
+  document.querySelectorAll("#presets button").forEach(b=>b.classList.toggle("on", b.dataset.r===r));
+  const now = Date.now()/1000|0;
+  let from = null;
+  if(r==="1h") from = now-3600;
+  else if(r==="6h") from = now-6*3600;
+  else if(r==="24h") from = now-86400;
+  else if(r==="today"){ const d=new Date(); d.setHours(0,0,0,0); from = d.getTime()/1000|0; }
+  if(r==="all"){
+    await loadRange(null, null);
+    if(histRows.length){ $("fromDt").value=toInput(histRows[0].timestamp); $("toDt").value=toInput(histRows[histRows.length-1].timestamp+60); }
+  } else {
+    $("fromDt").value = toInput(from); $("toDt").value = toInput(now+60);
+    await loadRange(from, now+60);
+  }
+}
+function openHist(focusKey){
+  const dlg = $("hist");
+  if(!dlg.open) dlg.showModal();
+  applyPreset("6h").then(()=>{ if(focusKey) $("hc_"+focusKey)?.scrollIntoView({behavior:"smooth", block:"center"}); });
+}
+$("openHist").onclick = () => openHist();
+$("closeHist").onclick = () => $("hist").close();
+$("hist").addEventListener("click", e=>{ if(e.target.id==="hist") $("hist").close(); });
+document.querySelectorAll("#presets button").forEach(b=>b.onclick=()=>applyPreset(b.dataset.r));
+$("applyRange").onclick = () => {
+  const f=fromInput($("fromDt").value), t=fromInput($("toDt").value);
+  if(f && t && f>=t){ $("histInfo").textContent="เวลาเริ่มต้นต้องมาก่อนเวลาสิ้นสุด"; return; }
+  document.querySelectorAll("#presets button").forEach(b=>b.classList.remove("on"));
+  loadRange(f, t);
+};
+$("csvBtn").onclick = () => {
+  if(!histRows.length) return;
+  const head = ["datetime","timestamp","flag",...METRICS.map(m=>m.k)];
+  const lines = histRows.map(r=>[toInput(r.timestamp).replace("T"," "), r.timestamp, r.flag, ...METRICS.map(m=>r[m.k])].join(","));
+  const blob = new Blob(["﻿"+head.join(",")+"\n"+lines.join("\n")], {type:"text/csv;charset=utf-8"});
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+  a.download = `${DB_NAME}-history-${toInput(histRows[0].timestamp).slice(0,10)}.csv`; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+};
+// กดการ์ดค่าเซ็นเซอร์ = เปิดดูย้อนหลังของค่านั้น
+KPI.forEach(c=>{ const el=$("k_"+c.k); el.title="กดเพื่อดูข้อมูลย้อนหลัง"; el.tabIndex=0; el.setAttribute("role","button");
+  el.onclick=()=>openHist(c.k); el.onkeydown=e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); openHist(c.k);} }; });
+
 /* ---------- แหล่งข้อมูล ---------- */
 const demo = new URLSearchParams(location.search).has("demo");
 if(demo){
   // โหมดทดลอง: สร้างข้อมูลปลอมในเบราว์เซอร์ (เปิดด้วย ?demo) ใช้ดูหน้าตาเมื่อยังไม่มี ESP32
-  let s={w:.8,wi:14,t:29.5,k:0,storm:0}; const H={};
+  let s={w:.8,wi:14,t:29.5,k:0,storm:0};
   const step=(ts)=>{
     if(!s.storm && Math.random()<.05) s.storm=8; const st=s.storm>0; if(st) s.storm--;
     s.w+=((st?3.2:.8)-s.w)*.3+(Math.random()-.5)*.3; s.w=Math.max(.1,s.w);
@@ -402,16 +647,23 @@ if(demo){
     return {wave_height:+s.w.toFixed(1), wind_speed:+s.wi.toFixed(1), uv_index:+Math.max(0,11*Math.exp(-(((h-12.5)/3)**2))).toFixed(1),
       water_temp:+(29.5+(Math.random()-.5)*.4).toFixed(1), rip_risk:Math.round(rip), tide_level:+(1.5+1.3*Math.sin(s.k*.05)).toFixed(2), flag, timestamp:ts};
   };
-  const now=Date.now()/1000|0;
-  for(let i=HISTORY_POINTS;i>0;i--){ H["d"+i]=step(now-i*10); }
-  onHistory(H); onLatest({...H["d1"]});
-  setInterval(()=>{ const d=step(Date.now()/1000|0); H["n"+d.timestamp]=d; const keys=Object.keys(H); if(keys.length>HISTORY_POINTS) delete H[keys[0]]; onHistory({...H}); onLatest({...d}); },10000);
+  const now=Date.now()/1000|0, ARCH=[];
+  for(let t=now-36*3600; t<=now; t+=30){ if(Math.random()<.002) t+=600; ARCH.push(step(t)); }
+  const recent = () => Object.fromEntries(ARCH.slice(-HISTORY_POINTS).map((d,i)=>["k"+i,d]));
+  onHistory(recent()); onLatest({...ARCH[ARCH.length-1]});
+  fetchRange = async (f,t) => ARCH.filter(r=>(f==null||r.timestamp>=f)&&(t==null||r.timestamp<=t)).map(r=>({...r}));
+  setInterval(()=>{ const d=step(Date.now()/1000|0); ARCH.push(d); onHistory(recent()); onLatest({...d}); },10000);
 }else{
   const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
-  const { getDatabase, ref, onValue, query, limitToLast } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+  const { getDatabase, ref, onValue, query, limitToLast, get, orderByChild, startAt, endAt } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
   const db = getDatabase(initializeApp({ databaseURL: DATABASE_URL }));
   onValue(ref(db,"latest"), s=>onLatest(s.val()), e=>{ $("statusText").textContent="เชื่อมต่อ Firebase ไม่ได้: "+e.message; $("dot").className="dot off"; });
   onValue(query(ref(db,"history"), limitToLast(HISTORY_POINTS)), s=>onHistory(s.val()));
+  fetchRange = async (f,t) => {
+    const q = (f==null && t==null) ? ref(db,"history")
+      : query(ref(db,"history"), orderByChild("timestamp"), startAt(f ?? 0), endAt(t ?? 9999999999));
+    return normalize((await get(q)).val());
+  };
 }
 </script>
 </body>
