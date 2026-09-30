@@ -10,58 +10,81 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
 :root{
-  --bg:#eef4f8; --surface:#ffffff; --surface-2:#f5f9fc; --line:#dbe5ec;
-  --ink:#10222e; --ink-2:#44596a; --ink-3:#6f8394;
-  --sea:#0a6ea8; --sea-soft:#dcedf7;
-  --good:#1a8a4a; --good-bg:#e3f4ea;
-  --warn:#b57500; --warn-bg:#fdf1d8;
-  --bad:#c62a2a;  --bad-bg:#fbe3e1;
-  --hero-1:#0b5f91; --hero-2:#0a8fb0;
-  --radius:16px; --shadow:0 1px 2px rgba(16,34,46,.06),0 4px 16px rgba(16,34,46,.06);
+  --bg:#f1f5f5; --bg-glow:#d9ecef; --sand:#f6efe3; --surface:#ffffff; --surface-2:#f4f8f8; --line:#dfe8ea;
+  --ink:#16303a; --ink-2:#4a6570; --ink-3:#71868f;
+  --sea:#2a7f9e; --sea-soft:#dcedf2;
+  --good:#23865a; --good-bg:#e2f3ea;
+  --warn:#a86f0b; --warn-bg:#fbf0da;
+  --bad:#c0413b;  --bad-bg:#f9e4e2;
+  --hero-1:#1d5d74; --hero-2:#3f95a6;
+  --radius:18px; --shadow:0 1px 2px rgba(22,48,58,.05),0 6px 20px rgba(22,48,58,.06);
 }
 @media (prefers-color-scheme: dark){
   :root{
-    --bg:#081620; --surface:#0f2230; --surface-2:#13293a; --line:#1f3a4f;
-    --ink:#e7f0f6; --ink-2:#a9bccb; --ink-3:#7d93a5;
-    --sea:#4fb3e8; --sea-soft:#133449;
-    --good:#4cc47f; --good-bg:#12321f;
-    --warn:#f0b43c; --warn-bg:#3a2c0e;
-    --bad:#ff6b63;  --bad-bg:#3d1616;
-    --hero-1:#093a58; --hero-2:#0a5a73;
+    --bg:#0c1a21; --bg-glow:#12303a; --sand:#0c1a21; --surface:#12232b; --surface-2:#172b34; --line:#223b46;
+    --ink:#e4eef0; --ink-2:#a5bcc3; --ink-3:#7b939b;
+    --sea:#6cc0d6; --sea-soft:#163945;
+    --good:#5cc592; --good-bg:#13332a;
+    --warn:#e7b85a; --warn-bg:#382d14;
+    --bad:#f07d74;  --bad-bg:#3a1b1a;
+    --hero-1:#12404f; --hero-2:#1e6272;
     --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25);
   }
 }
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans Thai",system-ui,sans-serif;font-size:15px;line-height:1.5}
+body{background:radial-gradient(900px 420px at 0% -8%,var(--bg-glow),transparent 70%),radial-gradient(700px 380px at 100% 0%,var(--sand),transparent 70%),var(--bg);background-attachment:fixed;min-height:100vh;color:var(--ink);font-family:"IBM Plex Sans Thai",system-ui,sans-serif;font-size:15px;line-height:1.5}
 .wrap{max-width:1180px;margin:0 auto;padding:20px 16px 40px}
 header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
 .brand{display:flex;align-items:center;gap:12px}
 .logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--hero-1),var(--hero-2));display:grid;place-items:center;flex:none}
 .brand h1{font-size:20px;margin:0;line-height:1.2}
 .brand p{margin:0;color:var(--ink-3);font-size:13px}
-.status{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);padding:8px 14px;border-radius:999px;font-size:13px;color:var(--ink-2)}
+.status{display:flex;align-items:center;gap:8px;background:color-mix(in srgb,var(--surface) 75%,transparent);backdrop-filter:blur(8px);border:1px solid var(--line);padding:8px 14px;border-radius:999px;font-size:13px;color:var(--ink-2)}
 .dot{width:10px;height:10px;border-radius:50%;background:var(--ink-3);flex:none}
 .dot.on{background:var(--good);box-shadow:0 0 0 0 var(--good);animation:pulse 2s infinite}
 .dot.off{background:var(--bad)}
 @keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--good) 60%,transparent)}70%{box-shadow:0 0 0 8px transparent}100%{box-shadow:0 0 0 0 transparent}}
 
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+.spot{position:relative;isolation:isolate}
+.spot::before{content:"";position:absolute;inset:0;border-radius:inherit;z-index:-1;pointer-events:none;opacity:0;transition:opacity .35s;
+  background:radial-gradient(240px circle at var(--mx,50%) var(--my,50%),color-mix(in srgb,var(--sea) 13%,transparent),transparent 70%)}
+.spot:hover::before{opacity:1}
+.reveal{animation:rise .7s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0)*70ms)}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 .card h2{font-size:15px;margin:0 0 12px;color:var(--ink-2);font-weight:600}
 
 .hero{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;margin-bottom:16px}
 .flag-card{position:relative;overflow:hidden;color:#fff;border:none;background:linear-gradient(135deg,var(--hero-1),var(--hero-2));padding:22px;min-height:220px}
-.flag-card .waves{position:absolute;left:0;right:0;bottom:-2px;opacity:.25}
+.flag-card::after{content:"";position:absolute;width:320px;height:320px;right:-80px;top:-120px;border-radius:50%;background:radial-gradient(circle,var(--flag-glow,rgba(255,255,255,.18)),transparent 65%);transition:background .8s;pointer-events:none}
+.flag-card[data-flag="0"]{--flag-glow:rgba(120,230,170,.30);--spd:1}
+.flag-card[data-flag="1"]{--flag-glow:rgba(255,210,90,.34);--spd:.6}
+.flag-card[data-flag="2"]{--flag-glow:rgba(255,110,100,.40);--spd:.35}
+.sea{position:absolute;left:0;right:0;bottom:0;height:96px;overflow:hidden;pointer-events:none}
+.sea svg{position:absolute;bottom:0;left:0;width:200%;height:100%;fill:#fff;will-change:transform}
+.sea .w1{opacity:.10;animation:drift calc(16s*var(--spd,1)) linear infinite}
+.sea .w2{opacity:.12;height:72%;animation:drift calc(10s*var(--spd,1)) linear infinite reverse}
+.sea .w3{opacity:.16;height:48%;animation:drift calc(22s*var(--spd,1)) linear infinite}
+@keyframes drift{to{transform:translateX(-50%)}}
+#flagShape{transform-box:fill-box;transform-origin:left center;animation:flutter calc(2.4s*var(--spd,1)) ease-in-out infinite;transition:fill .6s}
+@keyframes flutter{0%,100%{transform:skewY(0) scaleX(1)}50%{transform:skewY(-5deg) scaleX(.94)}}
 .flag-row{display:flex;align-items:center;gap:18px;position:relative}
 .flag-pole{width:84px;height:110px;flex:none}
 .flag-label{font-size:13px;opacity:.85;margin:0}
 .flag-title{font-size:32px;font-weight:700;margin:2px 0 4px;line-height:1.15}
 .flag-desc{margin:0;font-size:15px;opacity:.95}
+.score{position:relative;margin-top:22px;max-width:460px}
+.score .lbl{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;opacity:.9;margin-bottom:8px}
+.score .lbl b{font-size:26px;font-weight:700;opacity:1;font-variant-numeric:tabular-nums}
+.score .track{position:relative;height:8px;border-radius:99px;background:linear-gradient(90deg,#e8736b,#f1c35c 45%,#7fd6a6)}
+.score .knob{position:absolute;top:50%;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.25),0 2px 8px rgba(0,0,0,.25);left:50%;transition:left 1s cubic-bezier(.2,.7,.2,1)}
 .reasons{position:relative;display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
-.reasons span{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);padding:3px 10px;border-radius:999px;font-size:12.5px}
+.reasons span{background:rgba(255,255,255,.14);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.22);padding:3px 10px;border-radius:999px;font-size:12.5px}
 
 .act-list{display:grid;gap:8px}
-.act{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:var(--surface-2)}
+.act{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:var(--surface-2);transition:transform .2s,background .2s}
+.act:hover{transform:translateX(3px);background:var(--sea-soft)}
 .act .ico{font-size:20px;width:28px;text-align:center;flex:none}
 .act .name{font-weight:600}
 .act .note{font-size:12.5px;color:var(--ink-3)}
@@ -72,14 +95,18 @@ header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-betw
 .chip.bad{color:var(--bad);background:var(--bad-bg)}
 
 .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:16px}
-.kpi{padding:14px}
-.kpi .top{display:flex;align-items:center;justify-content:space-between;gap:6px;color:var(--ink-2);font-size:13px}
-.kpi .val{font-size:28px;font-weight:700;margin:6px 0 2px;line-height:1.1;font-variant-numeric:tabular-nums}
+.kpi{padding:14px 14px 12px}
+.kpi .top{display:flex;align-items:flex-start;justify-content:space-between;gap:6px;color:var(--ink-2);font-size:13px}
+.ring{width:46px;height:46px;flex:none;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:5}
+.ring .trk{stroke:var(--surface-2)}
+.ring .arc{stroke:var(--sea);stroke-linecap:round;transition:stroke-dasharray .9s cubic-bezier(.2,.7,.2,1),stroke .5s}
+.ring.good .arc{stroke:var(--good)} .ring.warn .arc{stroke:var(--warn)} .ring.bad .arc{stroke:var(--bad)}
+.kpi .foot{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px}
+.kpi .val{font-size:28px;font-weight:700;margin:0;line-height:1.1;font-variant-numeric:tabular-nums}
 .kpi .val small{font-size:14px;font-weight:500;color:var(--ink-3);margin-left:3px}
 .kpi .trend{font-size:12px;color:var(--ink-3)}
-.meter{height:6px;background:var(--surface-2);border-radius:99px;margin-top:10px;overflow:hidden;border:1px solid var(--line)}
-.meter i{display:block;height:100%;border-radius:99px;background:var(--sea);transition:width .6s ease}
-.meter.good i{background:var(--good)} .meter.warn i{background:var(--warn)} .meter.bad i{background:var(--bad)}
+.foot .chip::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.8}
 
 .legend-note{margin:10px 0 0;font-size:12.5px;color:var(--ink-3)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
@@ -96,12 +123,19 @@ header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-betw
 .log time{color:var(--ink-3);font-variant-numeric:tabular-nums;flex:none}
 .empty{color:var(--ink-3);font-size:13px}
 
-.toast{position:fixed;left:50%;top:16px;transform:translate(-50%,-200%);visibility:hidden;background:var(--bad);color:#fff;padding:12px 18px;border-radius:12px;font-weight:600;box-shadow:0 8px 30px rgba(0,0,0,.25);transition:transform .35s ease;z-index:10;max-width:calc(100% - 32px)}
+.toast{position:fixed;left:50%;top:16px;transform:translate(-50%,-200%);visibility:hidden;background:color-mix(in srgb,var(--bad) 88%,transparent);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.25);color:#fff;padding:12px 20px;border-radius:14px;font-weight:600;box-shadow:0 8px 30px rgba(0,0,0,.25);transition:transform .45s cubic-bezier(.2,.9,.3,1.2),visibility .45s;z-index:10;max-width:calc(100% - 32px)}
 .toast.show{transform:translate(-50%,0);visibility:visible}
 .card-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
 .card-head h2{margin:0}
 .btn{font:inherit;font-size:13.5px;font-weight:600;border:1px solid var(--sea);background:var(--sea);color:#fff;padding:7px 14px;border-radius:10px;cursor:pointer}
-.btn:hover{filter:brightness(1.08)}
+.btn:hover{filter:brightness(1.06)}
+.btn-glass{position:relative;overflow:hidden;border-radius:999px;padding:8px 18px;border:1px solid rgba(255,255,255,.35);
+  background:linear-gradient(135deg,color-mix(in srgb,var(--sea) 80%,#fff),var(--sea));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 18px color-mix(in srgb,var(--sea) 28%,transparent);transition:transform .2s,box-shadow .2s}
+.btn-glass::after{content:"";position:absolute;top:0;left:-70%;width:45%;height:100%;transform:skewX(-20deg);
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.5),transparent);transition:left .7s ease}
+.btn-glass:hover{transform:translateY(-1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 10px 24px color-mix(in srgb,var(--sea) 35%,transparent)}
+.btn-glass:hover::after{left:130%}
 .btn.ghost{background:transparent;color:var(--sea)}
 .icon-btn{font:inherit;font-size:18px;width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);cursor:pointer;flex:none}
 .kpi{cursor:pointer;transition:transform .15s ease,border-color .15s ease}
@@ -145,6 +179,7 @@ dialog#hist::backdrop{background:rgba(5,20,30,.55);backdrop-filter:blur(2px)}
 @media (max-width:1000px){.hcharts{grid-template-columns:1fr 1fr}}
 @media (max-width:720px){.hcharts,.sum-grid,.facts{grid-template-columns:1fr}dialog#hist{width:100vw;max-width:100vw;max-height:100dvh;height:100dvh;border:0;border-radius:0;margin:0}.sum-grid{grid-template-columns:minmax(0,1fr)}}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 footer{color:var(--ink-3);font-size:12.5px;text-align:center;margin-top:8px}
 footer code{background:var(--surface);border:1px solid var(--line);padding:1px 6px;border-radius:6px}
 
@@ -169,8 +204,12 @@ footer code{background:var(--surface);border:1px solid var(--line);padding:1px 6
   </header>
 
   <section class="hero">
-    <div class="card flag-card" id="flagCard">
-      <svg class="waves" viewBox="0 0 1200 120" preserveAspectRatio="none" width="100%" height="90" aria-hidden="true"><path d="M0 60 C150 20 300 100 450 60 S750 20 900 60 1200 100 1200 60 V120 H0Z" fill="#fff"/></svg>
+    <div class="card flag-card reveal" id="flagCard" data-flag="0" style="--i:0">
+      <div class="sea" aria-hidden="true">
+        <svg class="w1" viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0 45 Q180 5 360 45 T720 45 T1080 45 T1440 45 V100 H0Z"/></svg>
+        <svg class="w2" viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0 50 Q180 20 360 50 T720 50 T1080 50 T1440 50 V100 H0Z"/></svg>
+        <svg class="w3" viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0 55 Q180 30 360 55 T720 55 T1080 55 T1440 55 V100 H0Z"/></svg>
+      </div>
       <div class="flag-row">
         <svg class="flag-pole" viewBox="0 0 84 110" aria-hidden="true">
           <rect x="8" y="4" width="5" height="104" rx="2" fill="#fff" opacity=".9"/>
@@ -183,8 +222,12 @@ footer code{background:var(--surface);border:1px solid var(--line);padding:1px 6
         </div>
       </div>
       <div class="reasons" id="reasons"></div>
+      <div class="score" title="คำนวณจากคลื่น ลม และกระแสน้ำย้อน เทียบกับเกณฑ์ธงแดง">
+        <div class="lbl"><span>ดัชนีความปลอดภัยชายหาด</span><span><b id="scoreVal">–</b> / 100</span></div>
+        <div class="track"><span class="knob" id="scoreKnob"></span></div>
+      </div>
     </div>
-    <div class="card">
+    <div class="card spot reveal" style="--i:1">
       <h2>กิจกรรมที่ทำได้ตอนนี้</h2>
       <div class="act-list" id="acts"><p class="empty">รอข้อมูล…</p></div>
     </div>
@@ -192,10 +235,10 @@ footer code{background:var(--surface);border:1px solid var(--line);padding:1px 6
 
   <section class="kpis" id="kpis"></section>
 
-  <section class="card" style="margin-bottom:16px">
+  <section class="card reveal" style="margin-bottom:16px;--i:9">
     <div class="card-head">
       <h2>แนวโน้มล่าสุด (10 นาที)</h2>
-      <button class="btn" id="openHist" type="button">📊 ดูข้อมูลย้อนหลัง / เลือกวัน-เวลา</button>
+      <button class="btn btn-glass" id="openHist" type="button">📊 ดูข้อมูลย้อนหลัง / เลือกวัน-เวลา</button>
     </div>
     <div class="charts">
       <div class="chart-box"><h3>ความสูงคลื่น (m)</h3><div class="cv"><canvas id="cWave"></canvas></div></div>
@@ -206,11 +249,11 @@ footer code{background:var(--surface);border:1px solid var(--line);padding:1px 6
   </section>
 
   <section class="grid2">
-    <div class="card uv-box">
+    <div class="card uv-box spot reveal" style="--i:10">
       <h2>คำแนะนำแสงแดด</h2>
       <div id="uvAdvice"><p class="empty">รอข้อมูล…</p></div>
     </div>
-    <div class="card">
+    <div class="card spot reveal" style="--i:11">
       <h2>บันทึกเหตุการณ์</h2>
       <ul class="log" id="log"><li class="empty">ยังไม่มีเหตุการณ์</li></ul>
     </div>
@@ -273,10 +316,10 @@ footer code{background:var(--surface);border:1px solid var(--line);padding:1px 6
 
 <script type="module">
 /* ==================== ตั้งค่า (แก้ตรงนี้) ==================== */
-const DATABASE_URL = "https://iot-XXX-default-rtdb.asia-southeast1.firebasedatabase.app";
-const DB_NAME      = "iot-XXX";                   // ชื่อฐานข้อมูล
+const DATABASE_URL = "https://iot-219-default-rtdb.asia-southeast1.firebasedatabase.app/";
+const DB_NAME      = "iot-219";                   // ชื่อฐานข้อมูล
 const PLACE        = "หาดป่าตอง จ.ภูเก็ต (ข้อมูลจำลอง)";
-const OWNER        = "ชื่อ-นามสกุล  รหัส 6xxxxxxxxx";
+const OWNER        = "ปรมินทร์ ข้องรัก  รหัส 6710886219";
 const HISTORY_POINTS = 60;                        // จำนวนจุดในกราฟ
 const OFFLINE_AFTER  = 30;                        // วินาทีที่ไม่มีข้อมูลใหม่ = ออฟไลน์
 /* ============================================================= */
@@ -306,14 +349,26 @@ const KPI = [
   {k:"water_temp",  label:"อุณหภูมิน้ำ",  unit:"°C",   max:35,  dp:1, lv:()=>0, txt:["ปกติ"]},
   {k:"tide_level",  label:"ระดับน้ำ",    unit:"m",    max:3,   dp:2, lv:v=>v>2.4||v<0.5?1:0, txt:null},
 ];
-$("kpis").innerHTML = KPI.map(c=>`
-  <div class="card kpi" id="k_${c.k}">
-    <div class="top"><span>${c.label}</span><span class="chip" data-chip>–</span></div>
-    <div class="val"><span data-val>–</span><small>${c.unit}</small></div>
+$("kpis").innerHTML = KPI.map((c,i)=>`
+  <div class="card kpi spot reveal" style="--i:${i+3}" id="k_${c.k}">
+    <div class="top">
+      <div><div>${c.label}</div><div class="val"><span data-val>–</span><small>${c.unit}</small></div></div>
+      <svg class="ring" viewBox="0 0 50 50" aria-hidden="true"><circle class="trk" cx="25" cy="25" r="20"/><circle class="arc" data-arc cx="25" cy="25" r="20" pathLength="100" stroke-dasharray="0 100"/></svg>
+    </div>
+    <div class="foot"><span class="chip" data-chip>–</span></div>
     <div class="trend" data-trend>&nbsp;</div>
-    <div class="meter"><i data-bar style="width:0%"></i></div>
   </div>`).join("");
 
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+function ticker(el, to, dp){
+  const from = el._v ?? to; el._v = to;
+  if(REDUCED || from===to){ el.textContent = to.toFixed(dp); return; }
+  const t0 = performance.now(), dur = 700;
+  cancelAnimationFrame(el._raf);
+  const step = now => { const k = Math.min(1,(now-t0)/dur), e = 1-Math.pow(1-k,3);
+    el.textContent = (from+(to-from)*e).toFixed(dp); if(k<1) el._raf = requestAnimationFrame(step); };
+  el._raf = requestAnimationFrame(step);
+}
 let history = [];   // เรียงเก่า -> ใหม่
 let latest = null;
 
@@ -334,11 +389,11 @@ function renderKPIs(d){
     else label = c.txt[Math.min(L,c.txt.length-1)];
     const chip = el.querySelector("[data-chip]");
     chip.className = "chip "+CLS[L]; chip.textContent = label;
-    el.querySelector("[data-val]").textContent = v.toFixed(c.dp);
+    ticker(el.querySelector("[data-val]"), v, c.dp);
     el.querySelector("[data-trend]").textContent = trendOf(c.k) || " ";
-    const bar = el.querySelector("[data-bar]");
-    bar.style.width = Math.max(2,Math.min(100, v/c.max*100))+"%";
-    bar.parentElement.className = "meter "+CLS[L];
+    const pct = Math.max(2, Math.min(100, v/c.max*100));
+    el.querySelector("[data-arc]").setAttribute("stroke-dasharray", `${pct} 100`);
+    el.querySelector(".ring").setAttribute("class", "ring "+CLS[L]);
   }
 }
 let d_prevTide = 0;
@@ -346,6 +401,7 @@ let d_prevTide = 0;
 function renderFlag(d){
   const f = FLAG[d.flag] ?? FLAG[0];
   $("flagShape").setAttribute("fill", f.color);
+  $("flagCard").dataset.flag = d.flag;
   $("flagTitle").textContent = `${f.name} · ${f.title}`;
   $("flagDesc").textContent = f.desc;
   const r = [];
@@ -354,6 +410,10 @@ function renderFlag(d){
   r.push(`${["🍃","⚠️","⛔"][wi]} ลม ${d.wind_speed} km/h`);
   r.push(`${["✅","⚠️","⛔"][ri]} กระแสน้ำย้อน ${d.rip_risk}/100`);
   $("reasons").innerHTML = r.map(x=>`<span>${x}</span>`).join("");
+  const risk = Math.max(d.wave_height/TH.wave[1], d.wind_speed/TH.wind[1], d.rip_risk/TH.rip[1]);
+  const score = Math.max(0, Math.min(100, Math.round(100 - risk*60)));
+  ticker($("scoreVal"), score, 0);
+  $("scoreKnob").style.left = score + "%";
 }
 
 function renderActivities(d){
@@ -410,15 +470,25 @@ function renderLog(){
                                   : `<li class="empty">ยังไม่มีเหตุการณ์ในช่วงนี้ ทุกอย่างปกติ</li>`;
 }
 
+/* ---------- Spotlight: แสงตามเมาส์บนการ์ด ---------- */
+if(matchMedia("(hover:hover)").matches){
+  let raf=0, ev=null;
+  document.addEventListener("pointermove", e=>{ ev=e; if(raf) return; raf=requestAnimationFrame(()=>{ raf=0;
+    const c = ev.target.closest?.(".spot"); if(!c) return; const r=c.getBoundingClientRect();
+    c.style.setProperty("--mx", (ev.clientX-r.left)+"px"); c.style.setProperty("--my", (ev.clientY-r.top)+"px"); }); }, {passive:true});
+}
+
 /* ---------- กราฟ ---------- */
 const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const softFill = hex => ctx => { const {chart}=ctx, a=chart.chartArea; if(!a) return hex+"22";
+  const g=chart.ctx.createLinearGradient(0,a.top,0,a.bottom); g.addColorStop(0,hex+"55"); g.addColorStop(1,hex+"00"); return g; };
 Chart.defaults.font.family = '"IBM Plex Sans Thai", system-ui, sans-serif';
 Chart.defaults.color = css("--ink-3");
 function makeChart(id, key, lines, max){
   const ch = new Chart($(id), {
     type:"line",
     data:{labels:[], datasets:[
-      {data:[], borderColor:css("--sea"), backgroundColor:css("--sea-soft"), fill:true, borderWidth:2, pointRadius:0, pointHoverRadius:5, tension:.35},
+      {data:[], borderColor:css("--sea"), backgroundColor:softFill(css("--sea")), fill:true, borderWidth:2, pointRadius:0, pointHoverRadius:5, tension:.35},
       ...lines.map(([v,c,l])=>({label:l, data:[], borderColor:c, borderWidth:1.5, borderDash:[5,4], pointRadius:0, pointHoverRadius:0, fill:false, _th:v}))
     ]},
     options:{
@@ -523,7 +593,7 @@ function buildHistCharts(){
   if(Object.keys(hCharts).length) return;
   $("hcharts").innerHTML = METRICS.map(m=>`<div class="card sm" id="hc_${m.k}"><h3>${m.label}${m.unit?` (${m.unit==="/100"?"0–100":m.unit})`:""}</h3><div class="cv"><canvas id="hcv_${m.k}"></canvas></div></div>`).join("");
   for(const m of METRICS){
-    const ds=[{data:[], borderColor:css("--sea"), backgroundColor:css("--sea-soft"), fill:true, borderWidth:2, pointRadius:0, pointHoverRadius:5, tension:.25}];
+    const ds=[{data:[], borderColor:css("--sea"), backgroundColor:softFill(css("--sea")), fill:true, borderWidth:2, pointRadius:0, pointHoverRadius:5, tension:.25}];
     if(m.th) ds.push({data:[],borderColor:css("--warn"),borderWidth:1.5,borderDash:[5,4],pointRadius:0,pointHoverRadius:0},
                      {data:[],borderColor:css("--bad"), borderWidth:1.5,borderDash:[5,4],pointRadius:0,pointHoverRadius:0});
     hCharts[m.k] = new Chart($("hcv_"+m.k), {type:"line", data:{labels:[],datasets:ds},
